@@ -1,6 +1,4 @@
 name = "morningtrojan"
-main = ".next-on-pages/functions/[[path]].js"
-compatibility_date = "2025-08-31"
+compatibility_date = "2025-09-01"
 
-[site]
-bucket = ".next-on-pages/static"
+main = ".next-on-pages/worker.js"

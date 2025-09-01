@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack && next-on-pages",
+    "build": "next build --turbopack",
+    "cf:prepare": "next-on-pages",
     "start": "next start",
     "lint": "eslint",
-    "deploy": "npm run build && npx wrangler deploy"
+    "deploy": "npm run build && npm run cf:prepare && npx wrangler deploy"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
