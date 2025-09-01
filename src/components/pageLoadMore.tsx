@@ -2,29 +2,27 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import FlexSearch from "flexsearch";
+import {
+  Document,
+  EnrichedDocumentSearchResults,
+} from "flexsearch";
 import { PostData } from "@/lib/posts";
+
+type IndexablePostData = {
+  slug: string;
+  title: string;
+  content: string;
+};
 
 interface PageLoadMoreProps {
   allPostsData: PostData[];
 }
 
-interface EnrichedMatch<ID extends string = string> {
-  id: ID;
-  score?: number;
-}
-
-interface EnrichedResult<ID extends string = string> {
-  field: keyof PostData;
-  result: EnrichedMatch<ID>[];
-}
-
-
 export default function PageLoadMore({ allPostsData }: PageLoadMoreProps) {
   const limit = 20;
   const [visible, setVisible] = useState(limit);
   const [query, setQuery] = useState("");
-  const [index, setIndex] = useState<FlexSearch.Document<PostData>>();
+  const [index, setIndex] = useState<Document<IndexablePostData>>();
   const [results, setResults] = useState<PostData[]>(
     allPostsData.filter((post) => !post.hidden)
   );
@@ -32,18 +30,21 @@ export default function PageLoadMore({ allPostsData }: PageLoadMoreProps) {
   useEffect(() => {
     async function load() {
       const res = await fetch("/search-index.json");
-      const data: PostData[] = await res.json();
+      const data: (PostData & { content: string })[] = await res.json();
 
-      const idx = new FlexSearch.Document<PostData>({
+      const idx = new Document<IndexablePostData>({
         document: {
           id: "slug",
           index: ["title", "content"],
-          store: ["slug", "title", "date", "web_exclusive"],
+          store: ["slug", "title", "content"],
         },
         tokenize: "full",
       });
 
-      data.forEach((post) => idx.add(post));
+      data.forEach((post) =>
+        idx.add({ slug: post.slug, title: post.title, content: post.content })
+      );
+
       setIndex(idx);
       setResults(
         data
@@ -59,6 +60,7 @@ export default function PageLoadMore({ allPostsData }: PageLoadMoreProps) {
 
   useEffect(() => {
     if (!index) return;
+
     if (query.trim() === "") {
       setResults(
         allPostsData
@@ -71,11 +73,11 @@ export default function PageLoadMore({ allPostsData }: PageLoadMoreProps) {
       return;
     }
 
-    const matches: EnrichedResult[] = index.search(query.toLowerCase(), {
+    const matches = index.search(query.toLowerCase(), {
       enrich: true,
-    });
-    const slugs = matches.flatMap((m) => m.result.map((r) => r.id));
+    }) as EnrichedDocumentSearchResults<IndexablePostData>;
 
+    const slugs = matches.flatMap((m) => m.result.map((r) => r.id));
     const found = allPostsData
       .filter((p) => slugs.includes(p.slug) && !p.hidden)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
