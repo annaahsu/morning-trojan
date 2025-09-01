@@ -5,11 +5,12 @@
   "scripts": {
     "lint": "eslint",
     "dev": "next dev",
-    "build": "next build",
+    "build": "ts-node scripts/search.ts next build",
     "start": "next start",
     "deploy": "vercel --prod"
   },
   "dependencies": {
+    "flexsearch": "^0.8.205",
     "gray-matter": "^4.0.3",
     "next": "15.5.2",
     "next-mdx-remote": "^5.0.0",
@@ -21,11 +22,13 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/flexsearch": "^0.7.6",
     "@types/node": "^20.19.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   }
 }

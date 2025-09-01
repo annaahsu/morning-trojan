@@ -1,22 +1,90 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import FlexSearch from "flexsearch";
 import { PostData } from "@/lib/posts";
 
 interface PageLoadMoreProps {
   allPostsData: PostData[];
 }
 
+interface EnrichedMatch<ID extends string = string> {
+  id: ID;
+  score?: number;
+}
+
+interface EnrichedResult<ID extends string = string> {
+  field: keyof PostData;
+  result: EnrichedMatch<ID>[];
+}
+
+
 export default function PageLoadMore({ allPostsData }: PageLoadMoreProps) {
   const limit = 20;
   const [visible, setVisible] = useState(limit);
   const [query, setQuery] = useState("");
+  const [index, setIndex] = useState<FlexSearch.Document<PostData>>();
+  const [results, setResults] = useState<PostData[]>(
+    allPostsData.filter((post) => !post.hidden)
+  );
+
+  useEffect(() => {
+    async function load() {
+      const res = await fetch("/search-index.json");
+      const data: PostData[] = await res.json();
+
+      const idx = new FlexSearch.Document<PostData>({
+        document: {
+          id: "slug",
+          index: ["title", "content"],
+          store: ["slug", "title", "date", "web_exclusive"],
+        },
+        tokenize: "full",
+      });
+
+      data.forEach((post) => idx.add(post));
+      setIndex(idx);
+      setResults(
+        data
+          .filter((p) => !p.hidden)
+          .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+      );
+    }
+
+    load();
+  }, []);
+
+  useEffect(() => {
+    if (!index) return;
+    if (query.trim() === "") {
+      setResults(
+        allPostsData
+          .filter((p) => !p.hidden)
+          .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+      );
+      setVisible(limit);
+      return;
+    }
+
+    const matches: EnrichedResult[] = index.search(query.toLowerCase(), {
+      enrich: true,
+    });
+    const slugs = matches.flatMap((m) => m.result.map((r) => r.id));
+
+    const found = allPostsData
+      .filter((p) => slugs.includes(p.slug) && !p.hidden)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    setResults(found);
+    setVisible(limit);
+  }, [query, index, allPostsData]);
 
   const showMore = () => setVisible((prev) => prev + limit);
-  const filteredPosts = allPostsData.filter((post) =>
-    post.title.toLowerCase().includes(query.toLowerCase()) && !post.hidden
-  );
 
   return (
     <div className="posts-container">
@@ -25,14 +93,12 @@ export default function PageLoadMore({ allPostsData }: PageLoadMoreProps) {
         type="text"
         placeholder="Search posts..."
         value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setVisible(limit);
-        }}
+        onChange={(e) => setQuery(e.target.value)}
         className="search"
       />
+
       <div className="posts">
-        {filteredPosts
+        {results
           .slice(0, visible)
           .map(({ slug, title, date, web_exclusive }) => (
             <Link href={`/p/${slug}`} key={slug} className="list-item">
@@ -49,12 +115,12 @@ export default function PageLoadMore({ allPostsData }: PageLoadMoreProps) {
               )}
             </Link>
           ))}
-          {filteredPosts.length === 0 && (
-            <p className="no-results">No results found.</p>
-          )}
+        {query.trim() !== "" && results.length === 0 && (
+          <p className="no-results">No results found.</p>
+        )}
       </div>
 
-      {visible < filteredPosts.length && (
+      {visible < results.length && (
         <div>
           <button onClick={showMore} className="load-more-btn">
             Load More
