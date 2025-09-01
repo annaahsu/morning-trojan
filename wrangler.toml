@@ -6,4 +6,3 @@ main = "./.next-on-pages/functions/[[path]].js"
 
 [site]
 bucket = "./.next-on-pages/static"
-entry-point = "./.next-on-pages/functions/[[path]].js"
