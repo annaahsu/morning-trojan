@@ -1,0 +1,9 @@
+name = "morningtrojan"
+compatibility_date = "2025-08-31"
+
+# Worker entry points for dynamic routes
+main = "./.next-on-pages/functions/[[path]].js"
+
+[site]
+bucket = "./.next-on-pages/static"
+entry-point = "./.next-on-pages/functions/[[path]].js"
