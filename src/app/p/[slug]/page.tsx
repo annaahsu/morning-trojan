@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { getPostData } from "@/lib/posts";
 import Back from "@/components/backToArchive";
 
