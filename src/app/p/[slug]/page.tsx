@@ -32,6 +32,10 @@ export default async function NewsletterPage({
       </div>
       <Back />
       <style>{`
+        p {
+          margin: 0;
+        }
+          
         .content {
           display: flex;
           flex-direction: column;
