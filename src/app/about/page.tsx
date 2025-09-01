@@ -104,6 +104,12 @@ export default function AboutPage() {
         .tomo, .anna {
           border-radius: 50%;
         }
+
+        @media (max-width: 450px) {
+          .tomo, .anna {
+            display: none;
+          }
+        }
       `}</style>
     </main>
   );
