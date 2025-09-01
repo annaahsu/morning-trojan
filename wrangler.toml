@@ -1,4 +1,0 @@
-name = "morningtrojan"
-compatibility_date = "2025-09-01"
-
-main = ".next-on-pages/worker.js"

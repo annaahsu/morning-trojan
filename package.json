@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "cf:prepare": "next-on-pages",
-    "start": "next start",
     "lint": "eslint",
-    "deploy": "npm run build && npm run cf:prepare && npx wrangler deploy"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
@@ -21,14 +20,12 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.15",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20.19.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
-    "typescript": "^5",
-    "wrangler": "^4.33.1"
+    "typescript": "^5"
   }
 }
