@@ -3,6 +3,7 @@
 
   --red: #990000;
   --white: #ffffff;
+  --gray: #dddddd;
 
   font-size: 19px;
   line-height: 1.5;
@@ -42,6 +43,10 @@ a {
 button {
   border: none;
   outline: none;
+}
+
+footer p {
+  margin: 1rem 0;
 }
 
 .body {

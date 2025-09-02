@@ -22,9 +22,13 @@ export default function RootLayout({
         <footer className="footer">
           <p>
             You&apos;re all caught up. Thanks for reading Morning, Trojan, and
-            have a good day.
+            have a good day. <a href="https://annahsu.dev">Anna Hsu</a> copy
+            edits this newletter and built this website.
           </p>
-          <p>&copy; {new Date().getFullYear()} Tomoki Chien.</p>
+          <p>
+            &copy; {new Date().getFullYear()}{" "}
+            <a href="https://tomo.news">Tomoki Chien</a>.
+          </p>
         </footer>
       </body>
     </html>
